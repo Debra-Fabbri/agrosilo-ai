@@ -1,0 +1,344 @@
+{
+  "name": "checkpoint1_debra_fabbri",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        0,
+        0
+      ],
+      "id": "9b6bb687-aaa9-4255-8699-f51237040ef2",
+      "name": "When chat message received",
+      "webhookId": "85d88428-b655-415a-a072-a200f6fa7b7e"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemMessage": "ROL:\nEres AgroSilo Operations Agent, un agente especializado en análisis operativo de sistemas de almacenamiento de granos mediante silo-bolsas.\n\nÁMBITO:\nTu función se limita al análisis de información operativa relacionada con silo-bolsas. Puedes consultar el registro interno de silos y registrar nuevos silos cuando corresponda. No controlas maquinaria ni ejecutas acciones físicas.\n\nOBJETIVO:\nTu objetivo es identificar el silo involucrado, recopilar la información disponible, analizar su estado operativo y entregar una recomendación clara para el equipo responsable.\n\nHERRAMIENTAS:\nDispones de las siguientes herramientas:\n\n1. Silo Registry — Query: utilízala para consultar información registrada de un silo específico cuando necesites datos adicionales para analizar una situación o responder una consulta.\n2. Silo Registry — Register: utilízala únicamente cuando el usuario solicite registrar un nuevo silo y proporcione información suficiente para crear el registro. No la utilices para modificar o eliminar registros existentes.\n\nREGLAS DE OPERACIÓN:\n1. Utiliza la herramienta de consulta del registro de silos cuando necesites información que no esté disponible en el mensaje del usuario.\n2. Utiliza la herramienta de registro únicamente para dar de alta nuevos silos cuando exista información suficiente para crear el registro.\n3. Basa tus conclusiones únicamente en información proporcionada por el usuario o recuperada mediante las herramientas disponibles.\n4. No inventes mediciones, estados, fechas, ubicaciones ni antecedentes de un silo.\n5. Si falta información crítica para realizar el análisis o completar un registro, indícalo explícitamente y solicita el dato necesario.\n6. Diferencia siempre entre un dato observado y una inferencia del agente.\n7. Cuando detectes una situación que pueda requerir inspección humana, indícalo claramente.\n8. No establezcas umbrales, niveles de riesgo o condiciones técnicas específicas si dichos criterios no fueron proporcionados por el usuario o recuperados mediante una herramienta disponible.\n9. No recomiendes acciones técnicas específicas basándote únicamente en conocimiento general. Cuando no exista información suficiente para determinar la acción, indica que se requiere evaluación humana.\n\n\nRESTRICCIONES:\n- No estás autorizado a controlar maquinaria, modificar parámetros físicos de equipos, ordenar movimientos de personal o declarar un incidente como resuelto.\n- No debes ejecutar acciones físicas ni tomar decisiones irreversibles.\n- No debes modificar ni eliminar registros existentes.\n\nESCALAMIENTO:\nCuando la información disponible indique una posible condición operativa anómala, proporciona una recomendación y señala que la decisión final corresponde a un responsable humano.\nSi no existe información suficiente para determinar la situación, indícalo explícitamente y evita realizar conclusiones no sustentadas.\n\nFORMATO DE RESPUESTA:\nPresenta la respuesta de forma breve y estructurada utilizando:\n- Silo analizado\n- Información relevante\n- Evaluación\n- Recomendación\n- Necesidad de intervención humana",
+          "maxIterations": 7
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        224,
+        0
+      ],
+      "id": "8faef95c-c5a9-4bfa-9921-c6d038d352b9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-3.1-flash-lite",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        112,
+        240
+      ],
+      "id": "d9b42bea-7aef-4f33-8f3b-ad2d8b8a7d0e",
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "REDACTED",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "authentication": "oAuth2",
+        "select": "channel",
+        "channelId": {
+          "__rl": true,
+          "value": "C0BSRPAA6DP",
+          "mode": "list",
+          "cachedResultName": "agrosilo-ai"
+        },
+        "text": "=🌾 AGROSILO AI — EXECUTION REPORT\n\nResultado del agente: {{ $json.output }}  \nEstado: COMPLETED",
+        "otherOptions": {}
+      },
+      "type": "n8n-nodes-base.slack",
+      "typeVersion": 2.7,
+      "position": [
+        592,
+        0
+      ],
+      "id": "8f41f901-e525-4a22-82da-73fd1907cdfe",
+      "name": "Execution Report",
+      "webhookId": "6f4b1e6d-e65f-4c26-a4b8-c77a7fac4f80",
+      "credentials": {
+        "slackOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Slack account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Utiliza esta herramienta para consultar información operativa registrada sobre un silo específico cuando necesites datos para analizar una situación, responder una consulta o evaluar un evento. Busca el silo utilizando su silo_id y utiliza únicamente la información devuelta por el Silo Registry. No inventes datos si el silo no existe o si algún campo no está disponible. No utilices esta herramienta para registrar, modificar ni eliminar información.",
+        "documentId": {
+          "__rl": true,
+          "value": "1h8",
+          "mode": "list",
+          "cachedResultName": "AgroSilo — Silo Registry",
+          "cachedResultUrl": "https://docs.google.com/"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads AgroSilo",
+          "cachedResultUrl": "https://docs.google.com/"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "silo_id",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', `Identificador único del silo que se desea consultar. Debe utilizarse el silo_id proporcionado en la consulta o evento. Ejemplo: SILO-04.`, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        368,
+        240
+      ],
+      "id": "9ed280c6-2f52-4555-b962-9fcedff96f7b",
+      "name": "Silo Registry — Query",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Utiliza esta herramienta para registrar un nuevo silo en el Silo Registry cuando el usuario solicite explícitamente dar de alta un silo y proporcione información suficiente para crear el registro. El registro contiene identificación, ubicación, cultivo, toneladas, fechas de almacenamiento e inspección, estado operativo y, cuando estén disponibles, temperatura y humedad. No utilices esta herramienta para consultar silos existentes ni para modificar o eliminar registros. No inventes valores faltantes; si un dato requerido no fue proporcionado, solicítalo antes de registrar el silo.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1h8",
+          "mode": "list",
+          "cachedResultName": "AgroSilo — Silo Registry",
+          "cachedResultUrl": "https://docs.google.com/"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "Leads AgroSilo",
+          "cachedResultUrl": "https://docs.google.com/"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "silo_id": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('silo_id', `Identificador único del silo. Ejemplo: SILO-06.`, 'string') }}",
+            "campo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('campo', `Nombre del campo o establecimiento donde se encuentra el silo.`, 'string') }}",
+            "cultivo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('cultivo', `Tipo de cultivo almacenado, por ejemplo soja, maíz o trigo.`, 'string') }}",
+            "toneladas": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('toneladas', `Cantidad de producto almacenado, expresada en toneladas.`, 'string') }}",
+            "fecha_almacenamiento": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('fecha_almacenamiento', `Fecha en la que se realizó el almacenamiento del cultivo. Usar formato YYYY-MM-DD.`, 'string') }}",
+            "ultima_inspeccion": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('ultima_inspeccion', `Fecha de la última inspección registrada. Usar formato YYYY-MM-DD. Si no existe, dejar vacío.`, 'string') }}",
+            "estado": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('estado', `Estado operativo actual del silo. Ejemplos: Activo, Inactivo, Pendiente de inspección.`, 'string') }}",
+            "temperatura_actual": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('temperatura_actual', `Temperatura actual registrada del silo. Si no se dispone del dato, dejar vacío.`, 'string') }}",
+            "humedad_actual": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('humedad_actual', `Humedad actual registrada del silo. Si no se dispone del dato, dejar vacío.`, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "silo_id",
+              "displayName": "silo_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "campo",
+              "displayName": "campo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "cultivo",
+              "displayName": "cultivo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "toneladas",
+              "displayName": "toneladas",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "fecha_almacenamiento",
+              "displayName": "fecha_almacenamiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "ultima_inspeccion",
+              "displayName": "ultima_inspeccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "temperatura_actual",
+              "displayName": "temperatura_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "humedad_actual",
+              "displayName": "humedad_actual",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        528,
+        240
+      ],
+      "id": "a89cb930-b81e-45e4-9d39-2cd51d9536fc",
+      "name": "Silo Registry — Register",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "REDACTED",
+          "name": "Google Sheets account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Execution Report",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Silo Registry — Query": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Silo Registry — Register": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "26310bf4-84bc-4e87-90fa-d1fa9c452ee5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "9c3c71c689196e29bc4cc12faf8f95dddf4b309bcdd881a1d2f0c1d7c72ac77f"
+  },
+  "nodeGroups": [],
+  "id": "webhookId",
+  "tags": []
+}
