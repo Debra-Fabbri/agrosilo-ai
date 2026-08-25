@@ -1,5 +1,15 @@
-# agrosilo-ai
-Un agente de operaciones agroindustriales que recibe eventos provenientes de sensores/sistemas de monitoreo, analiza la situación, consulta información operativa y decide qué herramienta utilizar. 
+# AgroSilo AI
 
-NO controla físicamente maquinaria ni toma decisiones críticas de seguridad de forma autónoma.
-Analiza, prioriza, consulta información y genera/escalá acciones para supervisión humana.
+Agente de operaciones agroindustriales para monitoreo y análisis operativo de sistemas de almacenamiento mediante silo-bolsas.
+
+## M1 — Agente Base
+
+Primera versión del agente implementada en n8n.
+
+Incluye:
+- AI Agent / Tools Agent
+- Gemini
+- Google Sheets Tool
+- Slack observability
+- System Prompt estructurado
+- Guardrail de 7 iteraciones
